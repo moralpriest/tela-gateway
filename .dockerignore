@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github/
+*.md
+LICENSE
+docs/
+deploy/
+scripts/
+dist/
+.cloudfront-cert-arn
+**/*_test.go
+**/testdata
+go.mod.local-backup
+.gcloudignore
+fly.toml

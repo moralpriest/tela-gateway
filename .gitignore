@@ -1,0 +1,28 @@
+# Build artifacts
+/dist/
+*.zip
+tela-gateway
+/cmd/*/tela-gateway
+
+# Runtime / deploy state (never commit)
+.cloudfront-cert-arn
+*.pem
+*.key
+
+# Local env
+.env
+deploy/.env
+
+# TELA data / datashards clone cache
+datashards/
+/data/
+*.log
+
+# Go
+vendor/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

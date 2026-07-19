@@ -1,0 +1,44 @@
+# systemd unit for the tela-gateway Go binary (no Docker).
+#
+#   sudo cp deploy/systemd/tela-gateway.service /etc/systemd/system/
+#   sudo cp ./tela-gateway /usr/local/bin/tela-gateway
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now tela-gateway
+#
+# Put a reverse proxy (Caddy / nginx) in front for TLS. See
+# docs/deploy-binary.md.
+
+[Unit]
+Description=tela-gateway (TELA HTTP gateway)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Run as an unprivileged user. Create it first:
+#   sudo useradd --system --no-create-home --shell /usr/sbin/nologin tela
+User=tela
+Group=tela
+ExecStart=/usr/local/bin/tela-gateway
+Restart=on-failure
+RestartSec=5
+
+# Environment. Edit to taste, or use EnvironmentFile=/etc/tela-gateway.env
+Environment=PORT=8080
+Environment=TELA_HOST_SUFFIX=.tela.example.com
+Environment=RESERVED_APPS=status
+Environment=DERO_DAEMON_URLS=node.derofoundation.org:11012,dero.rabidmining.com:10102,dero-node.net:10102,community-pools.mysrv.cloud:10102
+Environment=TELA_DATA_DIR=/var/lib/tela-gateway
+
+# Writable state dir (datashards clone cache lives here).
+StateDirectory=tela-gateway
+WorkingDirectory=/var/lib/tela-gateway
+
+# Hardening.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,42 @@
+# Caddy config for tela-gateway.
+#
+# Two ways to get certificates for <app>.tela.example.com subdomains:
+#
+#   A) On-demand TLS (default below) — a cert is issued the first time each
+#      subdomain is requested, via the HTTP-01 challenge. No DNS-provider
+#      plugin needed. Works with the stock `caddy:2` image. Best when you do
+#      not know the full list of app subdomains ahead of time.
+#
+#   B) Wildcard cert (*.tela.example.com) — needs a DNS-provider build of Caddy
+#      (e.g. caddy-dns/cloudflare) and DNS API credentials. See
+#      docs/reverse-proxies.md. Swap the site block for:
+#
+#        *.tela.example.com {
+#            tls { dns cloudflare {env.CF_API_TOKEN} }
+#            reverse_proxy gateway:8080
+#        }
+#
+# Replace example.com with your domain (and keep it in sync with .env).
+
+{
+	email {$ACME_EMAIL}
+	on_demand_tls {
+		# Only issue certs for hostnames under your suffix. Point this at the
+		# gateway's /health so Caddy asks it whether a host is allowed.
+		ask http://gateway:8080/health
+	}
+}
+
+# Any subdomain of your TELA suffix. tls on_demand lets Caddy mint a cert per
+# subdomain the first time it is hit.
+*.tela.example.com {
+	tls {$ACME_EMAIL} {
+		on_demand
+	}
+	reverse_proxy gateway:8080
+}
+
+# Apex / status host (optional). Serves the gateway landing + status page.
+tela.example.com {
+	reverse_proxy gateway:8080
+}

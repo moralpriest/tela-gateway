@@ -1,0 +1,51 @@
+name: Bug report
+description: Something is not working as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: deploy
+    attributes:
+      label: How are you running tela-gateway?
+      options:
+        - Go binary (cmd/server)
+        - Local dev (cmd/local)
+        - Docker (single container)
+        - Docker Compose (with Caddy)
+        - AWS Lambda
+        - GCP Cloud Run
+        - Fly.io
+        - Other container host
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Commands, URLs, and config (redact secrets).
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: |
+        - tela-gateway version / commit
+        - Go version (`go version`) if building from source
+        - Relevant env vars (DERO_DAEMON_URLS, TELA_HOST_SUFFIX, ...) — redact secrets
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      render: shell
+    validations:
+      required: false

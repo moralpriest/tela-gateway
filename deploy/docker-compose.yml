@@ -1,0 +1,45 @@
+# tela-gateway + Caddy (automatic HTTPS via Let's Encrypt).
+#
+#   cp .env.example .env      # edit TELA_HOST_SUFFIX + your email
+#   docker compose up -d
+#
+# Caddy obtains and renews wildcard-friendly certs for *.<suffix> and proxies
+# every request to the gateway with the original Host header preserved (this is
+# Caddy's default — the gateway needs the viewer Host to resolve <app>.<suffix>).
+services:
+  gateway:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: tela-gateway:local
+    environment:
+      DERO_DAEMON_URLS: ${DERO_DAEMON_URLS:-node.derofoundation.org:11012,dero.rabidmining.com:10102,dero-node.net:10102,community-pools.mysrv.cloud:10102}
+      TELA_HOST_SUFFIX: ${TELA_HOST_SUFFIX:-.tela.example.com}
+      RESERVED_APPS: ${RESERVED_APPS:-status}
+      TELA_ALIASES: ${TELA_ALIASES:-}
+    expose:
+      - "8080"
+    volumes:
+      - gateway-data:/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TELA_HOST_SUFFIX: ${TELA_HOST_SUFFIX:-.tela.example.com}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@example.com}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+    depends_on:
+      - gateway
+
+volumes:
+  gateway-data: {}
+  caddy-data: {}
+  caddy-config: {}
