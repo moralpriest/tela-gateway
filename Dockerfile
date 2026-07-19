@@ -4,7 +4,7 @@
 #   docker build -t tela-gateway:local .
 #   docker run --rm -p 8080:8080 tela-gateway:local
 
-FROM golang:1.22-bookworm AS build
+FROM golang:1.24-bookworm AS build
 
 WORKDIR /src
 
